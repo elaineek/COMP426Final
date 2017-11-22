@@ -1,5 +1,10 @@
 # COMP426Final
 
+LILY: TO ACCESS THE DATABASES FOR THIS PROJECT THEY WILL BE IN MY ACCOUNT UNDER CLASSROOM.CS.UNC.EDU/PHPMYADMIN
+
+  username: elaineek
+  password: Jennifer420!*
+
 Thinking about what we need:
 
 A login in screen for individuals to log in (which means a table for users)
