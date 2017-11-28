@@ -36,11 +36,13 @@ $(document).ready(function () {
 		    		dataType: "json",
 		    		data: $(this).serialize(),
 		    		success: function(user_json, status, jqXHR) {
-		    			alert(user_json);
 		    			var u = new Users(user_json);
-		    			alert('Registration Successful!');},
+		    			alert('Registration Successful!');
+		    			$('#register_form')[0].reset();
+		    		},
 		    		error: function(jqXHR, status, error) {
-		    			alert(jqXHR.responext);}
+		    			console.log(error, status, jqXHR);}
+
 		    		});
     });
 
