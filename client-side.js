@@ -1,3 +1,5 @@
+var url_base = "..";
+
 $(document).ready(function () {
 
     $('#login_form').on('submit', function (e) {
@@ -26,17 +28,20 @@ $(document).ready(function () {
 	       });
     });
 
-    $('#register_form').on('submit', function(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    $.ajax('register.php',
-    		{type: 'POST',
-    		cache:false,
-    		success: function() {
-    			alert('Registration Successful!');},
-    		error: function() {
-    			alert('Registration Failed!');}
-    		});
+    $('#register_form').on('submit', 
+    		function(e) {
+   			e.preventDefault();
+		    $.ajax("register.php",
+		    		{type: 'POST',
+		    		dataType: "json",
+		    		data: $(this).serialize(),
+		    		success: function(user_json, status, jqXHR) {
+		    			alert(user_json);
+		    			var u = new Users(user_json);
+		    			alert('Registration Successful!');},
+		    		error: function(jqXHR, status, error) {
+		    			alert(jqXHR.responext);}
+		    		});
     });
 
     $('#secret_form').on('submit', function (e) {
