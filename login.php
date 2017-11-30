@@ -2,45 +2,86 @@
 session_start();
 
 function check_password($username, $password) {
-
-  $fd = fopen('hidden/passwords.txt', 'r');
-
-  while ($next_line = fgets($fd)) {
-
-    list($uname, $usalt, $uhash) = explode(' ', trim($next_line));
-
-    if ($uname == $username) {
-      if (md5($usalt . $password) == $uhash) {
-	fclose($fd);
-	return true;
-      }
-    }
+  $request = Users::find($username, $password);
+  if ($request == null) {
+    header("HTTP/1.0 500 Server Error");
+    print("Incorrect username or password. Please try again or register as a new user.");
+    exit();
   }
-  fclose($fd);
-  return false;
 }
 
-$username = $_GET['username'];
-$password = $_GET['password'];
+if(!isset($_REQUEST['username'])) {
+  header("HTTP/1.0 400 Bad Request");
+  print("Missing email");
+  exit();
+}
+$username = trim($_REQUEST['username']);
+if($username == "") {
+  header("HTTP/1.0 400 Bad Request");
+  print("Bad email");
+  exit();
+}
+if(!isset($_REQUEST['password'])) {
+  header("HTTP/1.0 400 Bad Request");
+  print("Missing password");
+  exit();
+}
+$ipassword = trim($_REQUEST['password']);
+if($ipassword == "") {
+  header("HTTP/1.0 400 Bad Request");
+  print("Bad password");
+  exit();
+}
+$password = md5($ipassword);
 
-if (check_password($username, $password)) {
-  header('Content-type: application/json');
+$check = check_password($username, $password);
+return $check;
 
-  // Generate authorization cookie
-  $_SESSION['username'] = $username;
-  $_SESSION['authsalt'] = time();
+class Users
+{
+  private $id;
+  private $username;
+  private $password;
 
-  $auth_cookie_val = md5($_SESSION['username'] . $_SERVER['REMOTE_ADDR'] . $_SESSION['authsalt']);
+  public static function connect() {
+    return new mysqli("classroom.cs.unc.edu", 
+                   "elaineek", 
+                   "Jennifer420!*", 
+               "elaineekdb");
+  }
 
-  setcookie('LOGIN_EXAMPLE_AUTH', $auth_cookie_val, 0, '/', 'wwwp.cs.unc.edu', true);
-  
-  print(json_encode(true));
+  public static function find($username, $password) {
+    $mysqli = Users::connect(); 
 
-} else {
-  unset($_SESSION['username']);
-  unset($_SESSION['authsalt']);
+    $select = $mysqli->query("select id from Users where username = '" . 
+      $mysqli->real_escape_string($username) . "' and password = '" .
+      $mysqli->real_escape_string($password) . "'");
 
-  header('HTTP/1.1 401 Unauthorized');
-  header('Content-type: application/json');
-  print(json_encode(false));
+    $info = $select->fetch_array();
+    $id = $info['id'];
+
+    if ($id) {
+      return new Users($id, $username, $password);
+    } else {
+      return null;
+    }
+  }
+
+  private function __construct($id, $username, $password) {
+    $this->id = $id;
+    $this->username = $username;
+    $this->password = $password;
+  }
+
+  public function getID() {
+    return $this->id;
+  }
+
+  public function getJSON() {
+
+    $json_obj = array('id' => $this->id,
+          'username' => $this->username,
+          'password' => $this->password);
+    return json_encode($json_obj);
+  }
 }

@@ -10,6 +10,7 @@
 <script src="jquery-3.2.1.js"></script>
 <script src="Users.js"></script>
 <script src="client-side.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js"></script>
 
 </head>
 
@@ -26,11 +27,11 @@
         group projects and events.</p>
 
       <form id='register_form'>
-        <input type="text" placeholder="First Name" name='firstname' id="firstname"><br>
-        <input type="text" placeholder="Last Name" name='lastname' id="surname"><br>
-        <input type="text" placeholder="Email address" name='username'><br>
-        <input type="text" placeholder="Re-enter email address" name='susername'><br>
-        <input type="password" placeholder="New password" name='password'><br><br>
+        <input type="text" placeholder="First Name" name='firstname' id="firstname" required><br>
+        <input type="text" placeholder="Last Name" name='lastname' id="surname" required><br>
+        <input type="email" placeholder="Email address" name='username' required><br>
+        <input type="email" placeholder="Re-enter email address" name='susername' required><br>
+        <input type="password" placeholder="Password" name='password' required><br><br>
         <input class="button" type="submit" value="Create an account">
       </form>
 
@@ -42,7 +43,7 @@
       <h3>Login here.</h3>
       <form id='login_form'>
         <input name='username' type="text" placeholder="Email address"><br>
-        <input name='password' type="password" placeholder="New password"><br><br>
+        <input name='password' type="password" placeholder="Password"><br><br>
         <input class="button" type="submit" value="Login">
       </form>
     </div>
