@@ -1,6 +1,28 @@
 <?php
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
+  if(!isset($_REQUEST['fname'])) {
+    header("HTTP/1.0 400 Bad Request");
+        print("Missing first name");
+        exit();
+  }
+  $fname = trim($_REQUEST['fname']);
+  if($fname == "") {
+    header("HTTP/1.0 400 Bad Request");
+        print("Bad first name");
+        exit();
+  }
+  if(!isset($_REQUEST['lname'])) {
+    header("HTTP/1.0 400 Bad Request");
+        print("Missing last name");
+        exit();
+  }
+  $lname = trim($_REQUEST['lname']);
+  if($lname == "") {
+    header("HTTP/1.0 400 Bad Request");
+        print("Bad last name");
+        exit();
+  }
 	if(!isset($_REQUEST['username'])) {
 		header("HTTP/1.0 400 Bad Request");
       	print("Missing email");
@@ -42,12 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     exit();
 	}
   $password = md5($ipassword);
-  $groupname = null;
-  if (isset($_REQUEST['groupname'])) {
-    $groupname = trim($_REQUEST['groupname']);
-  }
 
-  $new_user = Users::create($username, $password, $groupname);
+  $new_user = Users::create($username, $password, $fname, $lname);
 
     if($new_user == null) {
       header("HTTP/1.0 500 Server Error");
@@ -66,7 +84,8 @@ class Users
 	private $id;
 	private $username;
 	private $password;
-	private $groupname;
+  private $fname;
+  private $lname;
 
 	public static function connect() {
 		return new mysqli("classroom.cs.unc.edu", 
@@ -75,7 +94,7 @@ class Users
 		           "elaineekdb");
 	}
 
-	public static function create($username, $password, $groupname) {
+	public static function create($username, $password, $fname, $lname) {
 		$mysqli = Users::connect(); 
 
     $select = $mysqli->query("select id from Users where username = '" . 
@@ -90,25 +109,27 @@ class Users
       exit();
     } else {
       $s = "insert into Users values ('0', " .
+            "'" . $mysqli->real_escape_string($fname) . "', " .
+            "'" . $mysqli->real_escape_string($lname) . "', " .
             "'" . $mysqli->real_escape_string($username) . "', " .
-            "'" . $mysqli->real_escape_string($password) . "', " .
-            "'" . $mysqli->real_escape_string($groupname) . "')";
+            "'" . $mysqli->real_escape_string($password) . "')";
 
       $result = $mysqli->query($s);
 
       if ($result) {
         $id = $mysqli->insert_id;
-        return new Users($id, $username, $password, $groupname);
+        return new Users($id, $username, $password, $fname, $lname);
       }
       return null;
     }
 	}
 
-	private function __construct($id, $username, $password, $groupname) {
+	private function __construct($id, $username, $password, $fname, $lname) {
     $this->id = $id;
     $this->username = $username;
     $this->password = $password;
-    $this->groupname = $groupname;
+    $this->fname = $fname;
+    $this->lname = $lname;
   }
 
   public function getID() {
@@ -116,14 +137,11 @@ class Users
   }
 
   public function getJSON() {
-    if ($this->groupname == null) {
-      $groupname = null;
-    }
-
     $json_obj = array('id' => $this->id,
 		      'username' => $this->username,
 		      'password' => $this->password,
-		      'groupname' => $groupname);
+          'fname' => $this->fname,
+          'lname' => $this->lname);
     return json_encode($json_obj);
   }
 }

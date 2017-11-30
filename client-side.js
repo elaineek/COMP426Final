@@ -11,7 +11,9 @@ $(document).ready(function () {
 		cache: false,
 		success: function () {
 		    alert('Login Successful'); 
-			$('#login_form')[0].reset();},
+			$('#login_form')[0].reset();
+			//window.location.href = '/'
+			},
 		error: function (jqXHR, status, error) {
 		    alert(jqXHR.responseText);
 			$('#login_form')[0].reset();}
